@@ -1,45 +1,49 @@
-const { MongoClient } = require('mongodb');
+const express = require("express");
+const app = express();
+const port = 3001;
 
-async function main() {
-    /**
-     * Connection URI. Update <username>, <password>, and <your-cluster-url> to reflect your cluster.
-     * See https://docs.mongodb.com/ecosystem/drivers/node/ for more details
-     */
-    const uri = "mongodb+srv://mariefrance:nHiySisDhgiXRhXZ@cluster0.ghtaz.mongodb.net/";
+const { MongoClient, ServerApiVersion } = require("mongodb");
+const marchandiseRoutes = require("./src/routes/marchandiseRoutes");
+const marchandiseController = require("./src/controllers/marchandiseController");
+//const marchandiseController = require("./controllers/marchandiseController");
 
-    /**
-     * The Mongo Client you will use to interact with your database
-     * See https://mongodb.github.io/node-mongodb-native/3.6/api/MongoClient.html for more details
-     * In case: '[MONGODB DRIVER] Warning: Current Server Discovery and Monitoring engine is deprecated...'
-     * pass option { useUnifiedTopology: true } to the MongoClient constructor.
-     * const client =  new MongoClient(uri, {useUnifiedTopology: true})
-     */
-    const client = new MongoClient(uri);
+const uri =
+  "mongodb+srv://mariefrance:nHiySisDhgiXRhXZ@cluster0.ghtaz.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0";
 
-    try {
-        // Connect to the MongoDB cluster
-        await client.connect();
+const client = new MongoClient(uri, {
+  serverApi: {
+    version: ServerApiVersion.v1,
+    strict: true,
+    deprecationErrors: true,
+  },
+});
 
-        // Make the appropriate DB calls
-        await listDatabases(client);
+app.use(express.json());
 
-    } catch (e) {
-        console.error(e);
-    } finally {
-        // Close the connection to the MongoDB cluster
-        await client.close();
-    }
+async function run() {
+  try {
+    // Connexion à la base de données
+    await client.connect();
+    const database = client.db("expressmariefrance");
+    const collection = database.collection("marchandise");
+
+    marchandiseController.init(collection);
+
+    app.use("/", marchandiseRoutes);
+
+    // Middleware pour gérer les erreurs 500 (erreurs serveur)
+    app.use((err, req, res, next) => {
+      console.error(err.stack);
+      res.status(500).json({ message: "Erreur interne du serveur" });
+    });
+
+    // Démarrer le serveur
+    app.listen(port, () => {
+      console.log(`API en cours d'exécution sur http://localhost:${port}`);
+    });
+  } catch (err) {
+    console.error(err);
+  }
 }
 
-main().catch(console.error);
-
-/**
- * Print the names of all available databases
- * @param {MongoClient} client A MongoClient that is connected to a cluster
- */
-async function listDatabases(client) {
-    databasesList = await client.db().admin().listDatabases();
-
-    console.log("Databases:");
-    databasesList.databases.forEach(db => console.log(` - ${db.name}`));
-};
+run().catch(console.dir);
