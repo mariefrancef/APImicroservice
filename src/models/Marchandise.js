@@ -1,4 +1,4 @@
-class Produit {
+class Marchandise {
   constructor(id, nom, prix, volume) {
     this.id = id;
     this.nom = nom;
@@ -7,4 +7,7 @@ class Produit {
   }
 }
 
-let produits = [new Produit(0, "pomme", 1, 1), new Produit(1, "peche", 2, 1)];
+let marchandises = [
+  new Marchandise(0, "pomme", 1, 1),
+  new Marchandise(1, "peche", 2, 1),
+];
