@@ -23,6 +23,8 @@ function generateNonce(infos, difficulty = 3) {
   }
 }
 
+async function verifyNonce() {}
+
 async function generateToken(req, user, tokenModel) {
   let deviceFingerprint = generateDeviceFingerprint(req);
   tokenPlayload.userId = user._id;
@@ -33,7 +35,6 @@ async function generateToken(req, user, tokenModel) {
 
 async function verifyToken(tokenId, req) {}
 
-// persister le token en bdd
 // vérifier le nonce
 // vérifier le token
 module.exports = { generateNonce, generateToken, verifyToken };
