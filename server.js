@@ -1,12 +1,12 @@
 const express = require("express");
-const { MongoClient, ServerApiVersion } = require("mongodb");
-const userRoutes = require("./src/routes/user");
-const marchandiseRoutes = require("./src/routes/router");
-const marchandiseController = require("./src/controllers/marchandiseController");
-
 const app = express();
 const port = 3000;
 
+const { MongoClient, ServerApiVersion } = require("mongodb");
+const userRoutes = require("./src/routes/user");
+//const authRoutes = require("./src/utils/token.utils");
+
+// Connexion MongoDB
 const uri = "mongodb+srv://lucasplebani:hN1e4bZKgSJ3JQih@cluster0.ghtaz.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0";
 
 const client = new MongoClient(uri, {
@@ -15,34 +15,28 @@ const client = new MongoClient(uri, {
     strict: true,
     deprecationErrors: true,
   },
- 
 });
 
-app.use(express.json()); 
-// connection BDD
+app.use(express.json());
+
 async function run() {
   try {
     await client.connect();
-    console.log("Connection à la base de données réussie");
-
     const database = client.db("ExpressLucas");
-    const collection = database.collection("marchandise");
+    app.locals.db = database;
+    const userCollection = database.collection("users"); 
+    console.log("Connexion réussie à MongoDB");
 
-    
-    app.locals.db = database; // Ajout de la base de données à l'objet app.locals
-
-    marchandiseController.init(collection);
-
-    // Ajout des routes authentification | marchandises
-    app.use("/api/auth", userRoutes);
-    app.use("/", marchandiseRoutes); 
-
-    app.use((err, req, res, next) => {
-      console.error(err.stack);
-      res.status(500).json({ message: "Erreur interne du serveur" });
+    // Middleware pour ajouter la collection à chaque requête
+    app.use((req, res, next) => {
+      req.userCollection = userCollection;
+      next();
     });
 
-    // Démarrer le serveur
+    app.use("/", userRoutes);
+    //app.use("/", authRoutes);
+  
+    
     app.listen(port, () => {
       console.log(`API en cours d'exécution sur http://localhost:${port}`);
     });
@@ -52,4 +46,6 @@ async function run() {
 }
 
 run().catch(console.dir);
+
+
 
