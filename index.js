@@ -4,6 +4,7 @@ const port = 3001;
 
 const { MongoClient, ServerApiVersion } = require("mongodb");
 const userRoutes = require("./src/routes/userRoutes");
+let UserModel = require("./src/models/userModel");
 //const authRoutes = require("./src/utils/token.utils");
 
 // Connexion MongoDB
@@ -23,8 +24,10 @@ async function run() {
   try {
     await client.connect();
     const database = client.db("expressmariefrance");
-    const userCollection = database.collection("users"); 
+    const userCollection = database.collection("users");
     console.log("Connexion réussie à MongoDB");
+
+    UserModel = new UserModel(userCollection);
 
     // Middleware pour ajouter la collection à chaque requête
     app.use((req, res, next) => {

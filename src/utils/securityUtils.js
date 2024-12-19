@@ -7,5 +7,6 @@ function generateDeviceFingerprint(req) {
   const timezone = req.headers["timezone"] || "";
   const fingerprintData = `${userAgent}-${ip}-${timezone}`;
   return crypto.createHash("sha256").update(fingerprintData).digest("hex");
+}
 
-  module.exports = { generateDeviceFingerprint };
+module.exports = { generateDeviceFingerprint };
