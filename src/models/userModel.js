@@ -1,36 +1,36 @@
-const { ObjectId } = require("mongodb");
+const { ObjectId } = require('mongodb')
 
 class UserModel {
   constructor(collection) {
-    this.collection = collection;
+    this.collection = collection
   }
 
   async getAll() {
-    return await this.collection.find({}).toArray();
+    return await this.collection.find({}).toArray()
   }
   async getById(id) {
-    return await this.collection.findOne({ _id: new ObjectId(id) });
+    return await this.collection.findOne({ _id: new ObjectId(id) })
   }
-  async getSaltByMail(mail) {
-    const user = await this.collection.findOne({ mail: mail });
-    return user ? user.salt : null;
+  async getSaltByMail(email) {
+    const user = await this.collection.findOne({ email: email })
+    return user ? user.salt : null
   }
-  async getUserByMailAndHash(mail, hash) {
-    return await this.collection.findOne({ mail: mail, hash: hash });
+  async getUserByMailAndHash(email, hash) {
+    return await this.collection.findOne({ email: email, hash: hash })
   }
-  async getUserByMail(mail) {
-    return await this.collection.findOne({ mail: mail });
+  async getUserByMail(email) {
+    return await this.collection.findOne({ email: email })
   }
   async saveUser(userPayload) {
-    return await this.collection.insertOne(userPayload);
+    return await this.collection.insertOne(userPayload)
   }
-  async updateUserPassword(mail, hash) {
+  async updateUserPassword(email, hash) {
     const result = await this.collection.updateOne(
-      { mail: mail }, // Filtre pour trouver l'utilisateur par mail
-      { $set: { hash: hash } } // Mettre à jour le mot de passe haché
-    );
-    return result.modifiedCount > 0; // Retourne true si un document a été modifié
+      { email: email }, // Filtre pour trouver l'utilisateur par email
+      { $set: { hash: hash } }, // Mettre à jour le mot de passe haché
+    )
+    return result.modifiedCount > 0 // Retourne true si un document a été modifié
   }
 }
 
-module.exports = UserModel;
+module.exports = UserModel

@@ -1,7 +1,7 @@
 const { hashPassword, salt, verifyPassword } = require('../middleware/auth')
 const UserModel = require('../models/userModel')
 const { generateToken } = require('../models/tokenModel')
-const { generateNonce, verifyNonce, verifyToken } = require('../utils/token.utils')
+const { generateNonce, verifyNonce } = require('../utils/token.utils')
 const { pbkdf2 } = require('node:crypto')
 
 const userPayload = (name, email, password, salt) => {
@@ -47,21 +47,26 @@ const login = async (req, res, next) => {
     }
 
     const tokenGenerated = await generateToken(req, user)
-    console.log('token généré : ' + tokenGenerated)
+    //console.log('token généré : ' + tokenGenerated)
 
     const { nonce, proofOfWork } = generateNonce(tokenGenerated)
     tokenGenerated.nonce = nonce
     tokenGenerated.proofOfWork = proofOfWork
-    console.log('nonce : ' + nonce)
-    console.log('proofofwork : ' + proofOfWork)
+    //console.log('nonce : ' + nonce)
+    //console.log('proofofwork : ' + proofOfWork)
 
-    console.log('Vérification du token généré ...')
+    /*
     const verificationResult = await verifyToken(tokenGenerated, req, req.db)
     if (!verificationResult.valid) {
       console.error('Erreur de vérification du token : ', verificationResult.error)
       return res.status(401).json({ error: 'Échec de la vérification du token' })
     }
     console.log('Token validé avec succès pour le user : ', verificationResult.user)
+    */
+
+    console.log('Insertion du token dans la base de données...')
+    await req.tokenCollection.insertOne(tokenGenerated)
+    console.log('Token inséré avec succès')
 
     res.status(200).json({
       userId: user._id,
@@ -78,7 +83,8 @@ const login = async (req, res, next) => {
 
 // tokenPayload.nonce = nonce
 // tokenPayload.proofOfWork = proofOfWork
-
 // proofOfWork : toutes les informations de Token concaténés + hashé + nonce
+
+// vérifier qu'on a pas dépassé la date d'expiration sinon reconnexion
 
 module.exports = { signup, login }
