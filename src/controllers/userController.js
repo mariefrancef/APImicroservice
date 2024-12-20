@@ -19,7 +19,7 @@ const signup = async (req, res) => {
       return res.status(400).json({ message: 'Nom, email et mot de passe sont requis' })
     }
 
-    //console.log('Hashing du mot de passe...')
+    console.log('Hashing du mot de passe...')
     const { hashedPassword, salt } = await hashPassword(password)
     const user = userPayload(name, email, hashedPassword, salt)
 
@@ -28,7 +28,7 @@ const signup = async (req, res) => {
     //console.log('Utilisateur inséré avec succès')
     res.status(201).json({ message: 'Utilisateur créé avec succès !' })
   } catch (error) {
-    console.error(error)
+    //console.error(error)
     res.status(500).json({ message: "Erreur lors de la création de l'utilisateur" })
   }
 }
