@@ -9,7 +9,7 @@ function generateNonce(infos, difficulty = 3) {
 
   while (true) {
     const dataToHash = `${JSON.stringify(infos)}${nonce}`
-    console.log('Données hashées pour générer la preuve de travail :', dataToHash)
+    //console.log('Données hashées pour générer la preuve de travail :', dataToHash)
     const hash = sha256(dataToHash)
 
     if (hash.startsWith(targetPrefix)) {
@@ -26,32 +26,32 @@ async function verifyNonce(nonce) {
     return res.status(202)
   }
 }
-
+/*
 async function verifyToken(token, req, db) {
   try {
     console.log('Début de la vérification du token...')
 
     // Décomposer et vérifier les informations du token
     const { userId, nonce, proofOfWork, expiresIn, deviceFingerprint } = token
-    console.log('Contenu du token reçu : ', {
-      userId,
-      nonce,
-      proofOfWork,
-      expiresIn,
-      deviceFingerprint,
-    })
     if (!userId || !nonce || !proofOfWork || !expiresIn || !deviceFingerprint) {
       console.error('Token incomplet ou invalide')
       return { valid: false, error: 'Token incomplet ou invalide' }
     }
 
     // Vérifier la proof of work
-    const recomputedProof = sha256(`${JSON.stringify({ userId, expiresIn })}${nonce}`)
-    console.log('Preuve de travail recalculée : ', recomputedProof)
-    if (proofOfWork !== recomputedProof) {
-      console.error('Nonce ou preuve de travail invalide')
+    const targetPrefix = '0'.repeat(3)
+    const dataToHash = `${userId}${expiresIn}${deviceFingerprint}${nonce}`
+    //console.log('Données pour preuve de travail (vérification) :', dataToHash)
+
+    const recomputedProof = sha256(dataToHash)
+    console.log('proofofwork recalculée :', recomputedProof)
+
+    if (!recomputedProof.startsWith(targetPrefix)) {
+      //console.error('La preuve recalculée ne correspond pas à la difficulté requise.')
       return { valid: false, error: 'Nonce ou preuve de travail invalide' }
     }
+    console.log('Data pour PoW (génération) :', dataToHash)
+    console.log('Nonce trouvé :', nonce, 'PoW générée :', proofOfWork)
 
     // Vérifier l'expiration
     const currentTime = Date.now()
@@ -86,7 +86,7 @@ async function verifyToken(token, req, db) {
     return { valid: false, error: 'Erreur serveur' }
   }
 }
+  */
 
-// vérifier le nonce
 // vérifier le token
-module.exports = { generateNonce, verifyNonce, verifyToken }
+module.exports = { generateNonce, verifyNonce }
