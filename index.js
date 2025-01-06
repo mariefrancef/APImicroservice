@@ -5,6 +5,7 @@ const port = 3001
 const { MongoClient, ServerApiVersion } = require('mongodb')
 const userRoutes = require('./src/routes/userRoutes')
 let UserModel = require('./src/models/userModel')
+let cors = require('cors')
 //const authRoutes = require("./src/utils/token.utils");
 
 // Connexion MongoDB
@@ -19,6 +20,7 @@ const client = new MongoClient(uri, {
 })
 
 app.use(express.json())
+app.use(cors())
 
 async function run() {
   try {
